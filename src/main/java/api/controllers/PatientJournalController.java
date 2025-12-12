@@ -4,6 +4,7 @@ import api.dto.*;
 import core.enums.ConditionType;
 import core.enums.LocationType;
 import core.services.*;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -43,91 +44,11 @@ public class PatientJournalController {
     // GET
     // =======================
 
-    // Practitioners =======================
-
-    /** Get all practitioners with pagination */
-    @GET
-    @Path("/practitioners")
-    public List<PractitionerDTO> getAllPractitioners(
-            @QueryParam("pageIndex") @DefaultValue("0") int pageIndex,
-            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
-            @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return practitionerService.getAllPatients(pageIndex, pageSize, fetchRelations);
-    }
-
-    /** Get practitioner by ID */
-    @GET
-    @Path("/practitioners/{practitionerId}")
-    public PractitionerDTO getPractitionerById(@PathParam("practitionerId") UUID practitionerId,
-                                               @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return practitionerService.getPractitionerById(practitionerId, fetchRelations);
-    }
-
-    /** Get practitioners by organization */
-    @GET
-    @Path("/practitioners/organization/{organizationId}")
-    public List<PractitionerDTO> getPractitionersByOrganization(@PathParam("organizationId") UUID organizationId,
-                                                                @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return practitionerService.getPractitionersByOrganization(organizationId, fetchRelations);
-    }
-
-    /** Get practitioner by email */
-    @GET
-    @Path("/practitioners/email/{email}")
-    public PractitionerDTO getPractitionerByEmail(@PathParam("email") String email,
-                                                  @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return practitionerService.getPractitionerByEmail(email, fetchRelations);
-    }
-
-    // Patients =======================
-
-    /** Get all patients with pagination */
-    @GET
-    @Path("/patients")
-    public List<PatientDTO> getAllPatients(
-            @QueryParam("pageIndex") @DefaultValue("0") int pageIndex,
-            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
-            @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return patientService.getAllPatients(pageIndex, pageSize, fetchRelations);
-    }
-
-    /** Get patient by ID */
-    @GET
-    @Path("/patients/{patientId}")
-    public PatientDTO getPatientById(@PathParam("patientId") UUID patientId,
-                                     @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return patientService.getPatientById(patientId, fetchRelations);
-    }
-
-    /** Get patient by email */
-    @GET
-    @Path("/patients/email/{email}")
-    public PatientDTO getPatientByEmail(@PathParam("email") String email,
-                                        @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return patientService.getPatientByEmail(email, fetchRelations);
-    }
-
-    /** Search patients by name */
-    @GET
-    @Path("/patients/search")
-    public List<PatientDTO> searchPatients(@QueryParam("q") String searchTerm,
-                                           @QueryParam("pageIndex") @DefaultValue("0") int pageIndex,
-                                           @QueryParam("pageSize") @DefaultValue("10") int pageSize,
-                                           @QueryParam("fetchRelations") @DefaultValue("false") boolean fetchRelations) {
-        return patientService.searchPatientsByName(searchTerm, pageIndex, pageSize, fetchRelations);
-    }
-
-    /** Count total patients */
-    @GET
-    @Path("/patients/count")
-    public long countPatients() {
-        return patientService.countPatients();
-    }
-
     // Organizations =======================
 
     /** Get all organizations with pagination */
     @GET
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<OrganizationDTO> getAllOrganizations(@QueryParam("pageIndex") @DefaultValue("0") int pageIndex,
                                                      @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
         return organizationService.getAllOrganizations(pageIndex, pageSize);
@@ -135,6 +56,7 @@ public class PatientJournalController {
 
     /** Get organization by ID */
     @GET
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     @Path("/organizations/{organizationId}")
     public OrganizationDTO getOrganizationById(@PathParam("organizationId") UUID organizationId) {
         return organizationService.getOrganizationById(organizationId);
@@ -142,6 +64,7 @@ public class PatientJournalController {
 
     /** Get organizations by type */
     @GET
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     @Path("/organizations/type/{type}")
     public List<OrganizationDTO> getOrganizationsByType(@PathParam("type") String type) {
         return organizationService.getOrganizationsByType(core.enums.OrganizationType.valueOf(type));
@@ -149,6 +72,7 @@ public class PatientJournalController {
 
     /** Count total organizations */
     @GET
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     @Path("/organizations/count")
     public long countOrganizations() {
         return organizationService.countOrganizations();
@@ -159,6 +83,7 @@ public class PatientJournalController {
     /** Get all locations */
     @GET
     @Path("/locations")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<LocationDTO> getAllLocations() {
         return locationService.getAllLocations();
     }
@@ -166,6 +91,7 @@ public class PatientJournalController {
     /** Get location by ID */
     @GET
     @Path("/locations/{locationId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public LocationDTO getLocationById(@PathParam("locationId") UUID locationId) {
         return locationService.getLocationById(locationId);
     }
@@ -173,6 +99,7 @@ public class PatientJournalController {
     /** Get locations by type */
     @GET
     @Path("/locations/type/{type}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public LocationDTO getLocationByType(@PathParam("type") LocationType type) {
         return locationService.getLocationByType(type);
     }
@@ -180,6 +107,7 @@ public class PatientJournalController {
     /** Count total locations */
     @GET
     @Path("/locations/count")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public long countLocations() {
         return locationService.countLocations();
     }
@@ -189,6 +117,7 @@ public class PatientJournalController {
     /** Get all conditions for a patient (optionally eager load) */
     @GET
     @Path("/conditions/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ConditionDTO> getPatientConditions(
             @PathParam("patientId") UUID patientId,
             @QueryParam("eager") @DefaultValue("false") boolean eager
@@ -199,6 +128,7 @@ public class PatientJournalController {
     /** Get all conditions a practitioner assigned (optionally eager load) */
     @GET
     @Path("/conditions/practitioner/{practitionerId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ConditionDTO> getPractitionerConditions(
             @PathParam("practitionerId") UUID practitionerId
     ) {
@@ -208,6 +138,7 @@ public class PatientJournalController {
     /** Get condition by ID */
     @GET
     @Path("/conditions/{conditionId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public ConditionDTO getConditionById(@PathParam("conditionId") UUID conditionId) {
         return conditionService.getConditionById(conditionId);
     }
@@ -215,6 +146,7 @@ public class PatientJournalController {
     /** Get high severity conditions */
     @GET
     @Path("/conditions/high-severity")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ConditionDTO> getHighSeverityConditions() {
         return conditionService.getHighSeverityConditions();
     }
@@ -222,6 +154,7 @@ public class PatientJournalController {
     /** Get conditions by type */
     @GET
     @Path("/conditions/type/{conditionType}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ConditionDTO> getConditionsByType(@PathParam("conditionType") ConditionType conditionType) {
         return conditionService.getConditionsByType(conditionType);
     }
@@ -229,6 +162,7 @@ public class PatientJournalController {
     /** Count conditions for a patient */
     @GET
     @Path("/conditions/patient/{patientId}/count")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public long countPatientConditions(@PathParam("patientId") UUID patientId) {
         return conditionService.countPatientConditions(patientId);
     }
@@ -238,6 +172,7 @@ public class PatientJournalController {
     /** Get all encounters for a patient (optionally eager) */
     @GET
     @Path("/encounters/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<EncounterDTO> getPatientEncounters(
             @PathParam("patientId") UUID patientId,
             @QueryParam("eager") @DefaultValue("false") boolean eager
@@ -248,6 +183,7 @@ public class PatientJournalController {
     /** Get encounter by ID */
     @GET
     @Path("/encounters/{encounterId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public EncounterDTO getEncounterById(@PathParam("encounterId") UUID encounterId) {
         return encounterService.getEncounterById(encounterId);
     }
@@ -255,6 +191,7 @@ public class PatientJournalController {
     /** Get recent encounters */
     @GET
     @Path("/encounters/recent")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<EncounterDTO> getRecentEncounters(@QueryParam("eager") @DefaultValue("false") boolean eager) {
         return encounterService.getRecentEncounters(eager);
     }
@@ -262,6 +199,7 @@ public class PatientJournalController {
     /** Get all encounters for a practitioner */
     @GET
     @Path("/encounters/practitioner/{practitionerId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<EncounterDTO> getPractitionerEncounters(
             @PathParam("practitionerId") UUID practitionerId,
             @QueryParam("eager") @DefaultValue("false") boolean eager
@@ -272,6 +210,7 @@ public class PatientJournalController {
     /** Count encounters for a patient */
     @GET
     @Path("/count/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public long countPatientEncounters(@PathParam("patientId") UUID patientId) {
         return encounterService.countPatientEncounters(patientId);
     }
@@ -281,6 +220,7 @@ public class PatientJournalController {
     /** Get all observations for a patient */
     @GET
     @Path("/observations/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ObservationDTO> getPatientObservations(@PathParam("patientId") UUID patientId) {
         return observationService.getPatientObservations(patientId);
     }
@@ -288,6 +228,7 @@ public class PatientJournalController {
     /** Get observation by ID */
     @GET
     @Path("/observations/{observationId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public ObservationDTO getObservationById(@PathParam("observationId") UUID observationId) {
         return observationService.getObservationById(observationId);
     }
@@ -295,6 +236,7 @@ public class PatientJournalController {
     /** Get most recent observation for a patient */
     @GET
     @Path("/observations/recent/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public ObservationDTO getMostRecentObservation(@PathParam("patientId") UUID patientId) {
         return observationService.getMostRecentObservation(patientId);
     }
@@ -302,6 +244,7 @@ public class PatientJournalController {
     /** Get observations by practitioner */
     @GET
     @Path("/observations/practitioner/{practitionerId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public List<ObservationDTO> getPractitionerObservations(@PathParam("practitionerId") UUID practitionerId) {
         return observationService.getPractitionerObservations(practitionerId);
     }
@@ -309,6 +252,7 @@ public class PatientJournalController {
     /** Count observations for a patient */
     @GET
     @Path("/observations/count/patient/{patientId}")
+    @RolesAllowed({"Patient", "Doctor", "OtherStaff"})
     public long countPatientObservations(@PathParam("patientId") UUID patientId) {
         return observationService.countPatientObservations(patientId);
     }
@@ -323,6 +267,7 @@ public class PatientJournalController {
     @POST
     @Path("/organizations")
     @Transactional
+    @RolesAllowed({"Doctor"})
     public OrganizationDTO createOrganization(OrganizationDTO dto) {
         return organizationService.createOrganization(dto);
     }
@@ -333,6 +278,7 @@ public class PatientJournalController {
     @POST
     @Path("/locations")
     @Transactional
+    @RolesAllowed({"Doctor"})
     public LocationDTO createLocation(LocationDTO dto) {
         return locationService.createLocation(dto);
     }
@@ -343,6 +289,7 @@ public class PatientJournalController {
     @POST
     @Path("conditions/patient/{patientId}/practitioner/{practitionerId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public ConditionDTO createCondition(
             @PathParam("patientId") UUID patientId,
             @PathParam("practitionerId") UUID practitionerId,
@@ -357,6 +304,7 @@ public class PatientJournalController {
     @POST
     @Path("encounters/patient/{patientId}/practitioner/{practitionerId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public EncounterDTO createEncounter(
             @PathParam("patientId") UUID patientId,
             @PathParam("practitionerId") UUID practitionerId,
@@ -369,6 +317,7 @@ public class PatientJournalController {
 
     /** Create a new observation */
     @POST
+    @RolesAllowed({"Doctor", "OtherStaff"})
     @Path("/observations/patient/{patientId}/practitioner/{practitionerId}")
     @Transactional
     public ObservationDTO createObservation(@PathParam("patientId") UUID patientId,
@@ -387,6 +336,7 @@ public class PatientJournalController {
     @PUT
     @Path("organizations/{organizationId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public OrganizationDTO updateOrganization(@PathParam("organizationId") UUID organizationId,
                                               OrganizationDTO dto) {
         return organizationService.updateOrganization(organizationId, dto);
@@ -398,6 +348,7 @@ public class PatientJournalController {
     @PUT
     @Path("locations/{locationId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public LocationDTO updateLocation(@PathParam("locationId") UUID locationId,
                                       LocationDTO dto) {
         return locationService.updateLocation(locationId, dto);
@@ -409,6 +360,7 @@ public class PatientJournalController {
     @PUT
     @Path("conditions/{conditionId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public ConditionDTO updateCondition(
             @PathParam("conditionId") UUID conditionId,
             ConditionDTO dto
@@ -422,6 +374,7 @@ public class PatientJournalController {
     @PUT
     @Path("encounters/{encounterId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public EncounterDTO updateEncounter(
             @PathParam("encounterId") UUID encounterId,
             EncounterDTO dto
@@ -435,6 +388,7 @@ public class PatientJournalController {
     @PUT
     @Path("/observations/{observationId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public ObservationDTO updateObservation(@PathParam("observationId") UUID observationId,
                                             ObservationDTO dto) {
         return observationService.updateObservation(observationId, dto);
@@ -454,6 +408,7 @@ public class PatientJournalController {
     @DELETE
     @Path("/{locationId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public Response deleteLocation(@PathParam("locationId") UUID locationId) {
         boolean deleted = locationService.deleteLocation(locationId);
         if (deleted) {
@@ -469,6 +424,7 @@ public class PatientJournalController {
 
     /** Delete condition by ID */
     @DELETE
+    @RolesAllowed({"Doctor", "OtherStaff"})
     @Path("conditions/{conditionId}")
     @Transactional
     public Response deleteCondition(@PathParam("conditionId") UUID conditionId) {
@@ -486,6 +442,7 @@ public class PatientJournalController {
 
     /** Delete encounter */
     @DELETE
+    @RolesAllowed({"Doctor", "OtherStaff"})
     @Path("encounters/{encounterId}")
     @Transactional
     public Response deleteEncounter(@PathParam("encounterId") UUID encounterId) {
@@ -505,6 +462,7 @@ public class PatientJournalController {
     @DELETE
     @Path("/observations/{observationId}")
     @Transactional
+    @RolesAllowed({"Doctor", "OtherStaff"})
     public Response deleteObservation(@PathParam("observationId") UUID observationId) {
         boolean deleted = observationService.deleteObservation(observationId);
         if (deleted) {
